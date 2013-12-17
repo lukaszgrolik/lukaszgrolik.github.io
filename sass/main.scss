@@ -1,0 +1,37 @@
+@import "compass/css3";
+
+@import "vendor/**";
+
+@import "syntax";
+
+html {
+  @include rhythm-init(20px, 1.618, 'golden section');
+
+  font-family: 'Droid Serif', serif;
+}
+
+body {
+  @include centered-area(50em, 1em);
+}
+
+h1 {
+  @include rhythm-text(3);
+}
+
+h2 {
+  @include rhythm-text(2);
+}
+
+h1 {
+  @include rhythm-text(1);
+}
+
+p,
+.highlight {
+  margin: $rhythm 0;
+}
+
+code,
+.highlight {
+  font-family: monospace;
+}

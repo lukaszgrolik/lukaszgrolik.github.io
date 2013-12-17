@@ -1,0 +1,10 @@
+{
+  "name": "lukaszgrolik.github.io",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-contrib-compass": "~0.6.0",
+    "grunt-contrib-cssmin": "~0.6.2",
+    "load-grunt-tasks": "~0.2.0"
+  }
+}
