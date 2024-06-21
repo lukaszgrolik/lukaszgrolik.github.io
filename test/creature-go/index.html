@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>creature-go</title>
+
+  <style>
+    html {
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+
+
+
+<!-- <iframe
+  width="600"
+  height="450"
+  style="border:0"
+  loading="lazy"
+  allowfullscreen
+  referrerpolicy="no-referrer-when-downgrade"
+  src="https://www.google.com/maps/embed/v1/place?key=API_KEY
+    &q=Space+Needle,Seattle+WA">
+</iframe> -->
+
+<button id="button">get position</button>
+
+<div id="root"></div>
+
+<script>
+const rootEl = document.querySelector("#root");
+const buttonEl = document.querySelector("#button");
+
+const el = document.createElement("div");
+if ("geolocation" in navigator) {
+  /* geolocation is available */
+  el.innerHTML = `geolocation available`;
+
+} else {
+  /* geolocation IS NOT available */
+  el.innerHTML = `geolocation NOT available`;
+}
+rootEl.appendChild(el);
+
+function log(str) {
+  const el = document.createElement("div");
+  el.innerHTML = str;
+  rootEl.prepend(el);
+}
+function logPos(position, msg) {
+  const lat = position.coords.latitude;
+  const lon = position.coords.longitude;
+  console.log(lat, lon);
+
+  log(`(${msg}) ${new Date().toISOString()} - ${lat}, ${lon}`);
+}
+
+function geoGetPos()
+{
+  navigator.geolocation.getCurrentPosition((position) => {
+    logPos(position, "getPos");
+  });
+}
+// geoGetPos();
+
+const watchID = navigator.geolocation.watchPosition((position) => {
+  logPos(position, "watchPos");
+}, err => {
+  log(`error: ${err}`);
+  log(`error nessage: ${err.message}`);
+  log(`error stack: ${err.stack}`);
+});
+
+buttonEl.addEventListener('click', () => {
+  geoGetPos();
+})
+
+</script>
+
+</body>
+</html>
