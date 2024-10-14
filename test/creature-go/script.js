@@ -1,6 +1,5 @@
-const rootEl = document.querySelector("#root");
 const logEl = document.querySelector("#log");
-const buttonEl = document.querySelector("#button");
+const buttonEl = document.querySelector("#get-position-button");
 
 const logger = new CreatureGO.Logger();
 
