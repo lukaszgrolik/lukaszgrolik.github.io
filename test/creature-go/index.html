@@ -9,7 +9,14 @@
     html {
       font-family: monospace;
     }
+
+    #map { width: 1000px; height: 1000px; }
   </style>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
 <body>
 
@@ -26,59 +33,183 @@
     &q=Space+Needle,Seattle+WA">
 </iframe> -->
 
+
+<div id="map"></div>
+
 <button id="button">get position</button>
 
 <div id="root"></div>
+<div id="log"></div>
+
+<script src="api.js"></script>
 
 <script>
-const rootEl = document.querySelector("#root");
-const buttonEl = document.querySelector("#button");
+window.CreatureGO = {};
+</script>
 
-const el = document.createElement("div");
-if ("geolocation" in navigator) {
-  /* geolocation is available */
-  el.innerHTML = `geolocation available`;
+<script src="logger.js"></script>
 
-} else {
-  /* geolocation IS NOT available */
-  el.innerHTML = `geolocation NOT available`;
-}
-rootEl.appendChild(el);
+<script>
 
-function log(str) {
-  const el = document.createElement("div");
-  el.innerHTML = str;
-  rootEl.prepend(el);
-}
-function logPos(position, msg) {
-  const lat = position.coords.latitude;
-  const lon = position.coords.longitude;
-  console.log(lat, lon);
 
-  log(`(${msg}) ${new Date().toISOString()} - ${lat}, ${lon}`);
-}
 
-function geoGetPos()
-{
-  navigator.geolocation.getCurrentPosition((position) => {
-    logPos(position, "getPos");
-  });
-}
-// geoGetPos();
+const initialCenter = [50.2810577, 18.9695483]
 
-const watchID = navigator.geolocation.watchPosition((position) => {
-  logPos(position, "watchPos");
-}, err => {
-  log(`error: ${err}`);
-  log(`error nessage: ${err.message}`);
-  log(`error stack: ${err.stack}`);
+const map = leaflet.map('map')
+// .setView([51.505, -0.09], 13);
+.setView(initialCenter, 13);
+
+map.addEventListener('click', e => {
+    console.log('click', e.latlng)
+});
+const currentMousePos = {};
+map.addEventListener('mousemove', e => {
+    // console.log('move', e.latlng)
+    currentMousePos.lat = e.latlng.lat;
+    currentMousePos.lng = e.latlng.lng;
 });
 
-buttonEl.addEventListener('click', () => {
-  geoGetPos();
-})
+window.setZoom = (value) => {
+    map.setZoom(value);
+}
+
+leaflet.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+var iconOpts = {
+    shadowUrl: 'images/leaf-shadow.png',
+    iconSize: [38, 95], // size of the icon
+    shadowSize: [50, 64], // size of the shadow
+    iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
+    shadowAnchor: [4, 62],  // the same for the shadow
+    popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+};
+var redIcon = leaflet.icon({
+    iconUrl: 'images/leaf-red.png',
+    ...iconOpts
+});
+var greenIcon = leaflet.icon({
+    iconUrl: 'images/leaf-green.png',
+    ...iconOpts
+});
+var orangeIcon = leaflet.icon({
+    iconUrl: 'images/leaf-orange.png',
+    ...iconOpts
+});
+
+const creatures = API.creatures;
+
+// leaflet.marker([51.5, -0.09])
+const playerMarker = leaflet.marker([50.1801572, 18.9695551], { icon: redIcon })
+.addTo(map)
+
+// leaflet.marker(initialCenter, { icon: greenIcon })
+// .addTo(map)
+// .bindPopup('A pretty CSS popup.<br> Easily customizable.');
+//     // .openPopup();
+
+;(() => {
+    creatures.forEach(creature => {
+        var icon = leaflet.icon({
+            iconUrl: `images/${creature.icon.iconPath}`,
+            // shadowUrl: 'images/leaf-shadow.png',
+            iconSize: creature.icon.iconSize,
+            // shadowSize: [50, 64],
+            iconAnchor: creature.icon.iconAnchor,
+            // shadowAnchor: [4, 62],
+            // popupAnchor: [-3, -76]
+        });
+
+        creature.positions.flat().forEach(pos => {
+            const marker = leaflet.marker([pos.lat, pos.lng], { icon: icon })
+            .addTo(map)
+        });
+    });
+})();
+
+// L.circle(initialCenter, { radius: 1000, color: '#00f7' }).addTo(map);
+// L.circle(initialCenter, { radius: 500, color: '#00f7' }).addTo(map);
+// L.circle(initialCenter, { radius: 250, color: '#00f7' }).addTo(map);
+L.circle(initialCenter, { radius: 100, color: '#00f7' }).addTo(map);
+
+var polygon = L.polygon(API.areas[0].map(p => [p.lat, p.lng]), {color: '#00f'}).addTo(map);
+
+var polygon = L.polygon(API.areas[1].map(p => [p.lat, p.lng]), {color: '#0f0'}).addTo(map);
+
+leaflet.polyline(API.routes[0].map(p => [p.lat, p.lng]), {color: '#f00'}).addTo(map);
+
+leaflet.polyline(API.routes[1].map(p => [p.lat, p.lng]), {color: '#f70'}).addTo(map);
+
+function setPlayerMarkerPos(position) {
+    playerMarker.setLatLng(leaflet.latLng(position.coords.latitude, position.coords.longitude));
+}
+
+window.onGeolocationChanged = position => {
+    // console.log('position', position)
+    // playerMarker.setLatLng(leaflet.latLng(position.coords.latitude, position.coords.longitude));
+
+    setPlayerMarkerPos(position);
+};
+
+setTimeout(() => {
+    // map.setView([49.2810572, 18.9695551], 13);
+}, 2000);
+
+// posSim();
+function posSim() {
+    const pos = {coords: {latitude: 50.2810602, longitude: 18.9695611 }}
+
+    const delta = 1 / 60;
+    const deltaMs = delta * 1000;
+
+    function loop() {
+        pos.coords.longitude += .0025 * delta;
+
+        setPlayerMarkerPos(pos);
+
+        setTimeout(() => {
+            loop();
+        }, deltaMs);
+    }
+
+    loop();
+}
+
+var latlngs = [
+    [45.51, -122.68],
+    [37.77, -122.43],
+    [34.04, -118.2]
+];
+
+// var polyline = leaflet.polyline(latlngs, {color: '#f004'}).addTo(map);
+
+// // zoom the map to the polyline
+// map.fitBounds(polyline.getBounds());
+
+// var latlngs = [
+//         [ // first polygon
+//             [[37, -109.05], [41, -109.03], [41, -102.05], [37, -102.04]], // outer ring
+//             [[37.29, -108.58], [40.71, -108.58], [40.71, -102.50], [37.29, -102.50]] // hole
+//         ],
+//         [ // second polygon
+//             [[41, -111.03], [45, -111.04], [45, -104.05], [41, -104.05]]
+//         ]
+//     ];
+
+// var polygon = L.polygon(latlngs, {color: '#f007'}).addTo(map);
+
+// // zoom the map to the polygon
+
+
+// const circle = L.circle([50.5, 30.5], { radius: 200, color: '#00f7' }).addTo(map);
+
+// map.fitBounds(circle.getBounds());
 
 </script>
+
+<script src="script.js"></script>
+
 
 </body>
 </html>
