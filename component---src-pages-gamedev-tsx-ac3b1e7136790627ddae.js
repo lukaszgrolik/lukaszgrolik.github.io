@@ -1,0 +1,6 @@
+"use strict";(self.webpackChunkgatsby_starter_hello_world=self.webpackChunkgatsby_starter_hello_world||[]).push([[378],{870:function(e,t,n){n.d(t,{p:function(){return l}});const l=(e,t,n,l,r)=>`repeating-linear-gradient(\n    ${e}deg,\n    ${t},\n    ${t} ${l},\n    ${n} ${l},\n    ${n} ${r}\n)`},5784:function(e,t,n){n.r(t),n.d(t,{default:function(){return s}});var l=n(6540),r=n(6143),a=n(6388),d=n(4273),o=n(9777),c=n(870),i=n(4578);const u=r.A.div`
+    /* > * + * {
+        margin-top: 1em;
+    } */
+`;function s(){return l.createElement(a.i,null,l.createElement(u,null,l.createElement("div",{style:{backgroundColor:"#fff",position:"relative",boxShadow:"0 0 .25em rgba(0, 0, 0, .5)"}},l.createElement(i.$G,null,l.createElement("div",{style:{padding:"3em 0"}},l.createElement("div",{style:{display:"flex",justifyContent:"center"}},l.createElement(d.A,null))))),l.createElement("div",{style:{background:(0,c.p)(135,"hsl(240, 25%, 50%)","hsla(240, 25%, 50%, .95)","1em","1.5em"),padding:"2em 0"}},l.createElement(i.$G,null,l.createElement("div",{style:{backgroundColor:"#fff",padding:"2em",boxShadow:"0 0 .25em rgba(0, 0, 0, .5)"}},l.createElement(o.A,{extended:!0}))))))}}}]);
+//# sourceMappingURL=component---src-pages-gamedev-tsx-ac3b1e7136790627ddae.js.map
